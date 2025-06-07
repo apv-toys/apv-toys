@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APV Toys - Magazin de Jucării</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("YOUR_USER_ID"); // Înlocuiește YOUR_USER_ID cu user ID-ul tău din EmailJS
+    })();
+  </script>
+  <style>
+    /* stiluri CSS (nicio modificare aici) */
+    body {
+      margin: 0;
+      font-family: 'Comic Neue', cursive;
+      background: #fef8ec;
+      color: #333;
+    }
+    /* ... restul CSS-ului rămâne la fel ... */
+  </style>
+</head>
+<body>
+  <!-- conținut HTML neschimbat până la script -->
+  <!-- ... restul site-ului ... -->
+
+  <script>
+    const cart = [];
+
+    function addToCart(name, price) {
+      cart.push({ name, price });
+      updateCart();
+    }
+
+    function updateCart() {
+      const cartItems = document.getElementById('cart-items');
+      const cartTotal = document.getElementById('cart-total');
+      cartItems.innerHTML = '';
+      let total = 0;
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.textContent = `${item.name} - ${item.price} RON`;
+        cartItems.appendChild(div);
+        total += item.price;
+      });
+      cartTotal.textContent = `Total: ${total} RON`;
+    }
+
+    function finalizeOrder() {
+      const fullname = document.getElementById('fullname').value;
+      const address = document.getElementById('address').value;
+      const phone = document.getElementById('phone').value;
+      const payment = document.getElementById('payment').value;
+      const courier = document.getElementById('courier').value;
+      const summary = document.getElementById('order-summary');
+
+      if (!fullname || !address || !phone) {
+        summary.textContent = 'Te rugăm să completezi toate câmpurile!';
+        return;
+      }
+
+      if (cart.length === 0) {
+        summary.textContent = 'Coșul este gol!';
+        return;
+      }
+
+      const cartDetails = cart.map(item => `${item.name} - ${item.price} RON`).join("\n");
+      const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+      const templateParams = {
+        to_name: 'APV Toys',
+        from_name: fullname,
+        message: `Produse comandate:\n${cartDetails}\n\nTotal: ${total} RON\n\nLivrare la: ${address}\nTelefon: ${phone}\nPlată: ${payment}\nCurier: ${courier}`
+      };
+
+      emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
+        .then(function(response) {
+          summary.textContent = "Comanda a fost trimisă cu succes!";
+        }, function(error) {
+          summary.textContent = "Eroare la trimiterea comenzii. Încearcă din nou.";
+        });
+    }
+  </script>
+</body>
+</html>
